@@ -25,7 +25,9 @@
     ])
   }
   var tree = renderTree()
-  var root = tree.render()
+  var ser = Element.serialize(tree)
+  var des = Element.deserialize(ser)
+  var root = des.render()
   document.body.appendChild(root)
   </script>
 

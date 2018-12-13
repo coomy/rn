@@ -7,7 +7,7 @@
  * @param {Array<Element|String>} - This element's children elements.
  *                                - Can be Element instance or just a piece plain text.
  */
-function Element (tagName, props, children) {
+function Element(tagName, props, children) {
   if (!(this instanceof Element)) {
     if (!_.isArray(children) && children != null) {
       children = _.slice(arguments, 2).filter(_.truthy)
@@ -29,7 +29,7 @@ function Element (tagName, props, children) {
 
   var count = 0
 
-  _.each(this.children, function (child, i) {
+  _.each(this.children, function(child, i) {
     if (child instanceof Element) {
       count += child.count
     } else {
@@ -44,7 +44,7 @@ function Element (tagName, props, children) {
 /**
  * Render the hold element tree.
  */
-Element.prototype.render = function () {
+Element.prototype.render = function() {
   var el = document.createElement(this.tagName)
   var props = this.props
 
@@ -53,13 +53,28 @@ Element.prototype.render = function () {
     _.setAttr(el, propName, propValue)
   }
 
-  _.each(this.children, function (child) {
+  _.each(this.children, function(child) {
     var childEl = (child instanceof Element)
       ? child.render()
       : document.createTextNode(child)
     el.appendChild(childEl)
   })
 
+  return el
+}
+
+Element.serialize = function(el) {
+  return JSON.stringify(el)
+}
+
+Element.deserialize = function(json) {
+  var el = JSON.parse(json)
+  function makeElement(obj) {
+    obj.__proto__ = Element.prototype
+    // obj.constructor = Element
+    _.each(obj.children, makeElement)
+  }
+  makeElement(el)
   return el
 }
 

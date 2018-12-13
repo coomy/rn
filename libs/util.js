@@ -20,7 +20,8 @@ _.isString = function isString (list) {
   return _.type(list) === 'String'
 }
 
-_.each = function each (array, fn) {
+_.each = function each(array, fn) {
+  if (!array) return
   for (var i = 0, len = array.length; i < len; i++) {
     fn(array[i], i)
   }
