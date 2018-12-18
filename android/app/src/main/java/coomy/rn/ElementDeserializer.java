@@ -35,7 +35,7 @@ public class ElementDeserializer implements JsonDeserializer<Element> {
                     childrens[i] = deserialize(jsonChildren, typeOfT, context);
                 }
                 else {
-                    childrens[i] =
+                    childrens[i] = null; // 这个地方怎么处理。。如果特殊化，必须重写Serializer了。那两个都重写了，要考虑下TypeAdapter。
                 }
             }
         }

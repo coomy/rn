@@ -89,7 +89,9 @@ public class MainActivity extends AppCompatActivity {
         String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"],\"count\":1}],\"count\":15}";
         Element el = gson.fromJson(Json, Element.class);
 
-        Log.e("Coomy", "Result : " + el.tagName);
+        String jsonnn = gson.toJson(el);
+
+        Log.e("Coomy", "Result : " + el.tagName + jsonnn);
 
         runtime.release();
     }
