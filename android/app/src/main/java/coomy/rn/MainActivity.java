@@ -12,6 +12,7 @@ import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,13 +55,13 @@ public class MainActivity extends AppCompatActivity {
         JavaVoidCallback callback = new JavaVoidCallback() {
             @Override
             public void invoke(V8Object v8Object, V8Array v8Array) {
-                if (v8Array.length() > 0) {
-                    Object arg1 = v8Array.get(0);
-                    Log.e("CoomyRn", "js callback args : " + arg1);
-                    if (arg1 instanceof Releasable) {
-                        ((Releasable) arg1).release();
-                    }
+            if (v8Array.length() > 0) {
+                Object arg1 = v8Array.get(0);
+                Log.e("CoomyRn", "js callback args : " + arg1);
+                if (arg1 instanceof Releasable) {
+                    ((Releasable) arg1).release();
                 }
+            }
             }
         };
 
@@ -84,9 +85,11 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("Coomy", "Result : " + res);
 
-//        Gson gson = new Gson();
-//        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"children\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"children\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"children\":[\"hello world\"],\"count\":1}],\"count\":15}";
-//        Element el = gson.fromJson(Json, Element.class);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Element.class, new ElementDeserializer()).create();
+        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"],\"count\":1}],\"count\":15}";
+        Element el = gson.fromJson(Json, Element.class);
+
+        Log.e("Coomy", "Result : " + el.tagName);
 
         runtime.release();
     }
