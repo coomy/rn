@@ -4,36 +4,36 @@
  * @param {String} tagName
  * @param {Object} props - Element's properties,
  *                       - using object to store key-value pair
- * @param {Array<Element|String>} - This element's children elements.
+ * @param {Array<Element|String>} - This element's childrens elements.
  *                                - Can be Element instance or just a piece plain text.
  */
-function Element(tagName, props, children) {
+function Element(tagName, props, childrens) {
   if (!(this instanceof Element)) {
-    if (!_.isArray(children) && children != null) {
-      children = _.slice(arguments, 2).filter(_.truthy)
+    if (!_.isArray(childrens) && childrens != null) {
+      childrens = _.slice(arguments, 2).filter(_.truthy)
     }
-    return new Element(tagName, props, children)
+    return new Element(tagName, props, childrens)
   }
 
   if (_.isArray(props)) {
-    children = props
+    childrens = props
     props = {}
   }
 
   this.tagName = tagName
   this.props = props || {}
-  this.children = children || []
+  this.childrens = childrens || []
   this.key = props
     ? props.key
     : void 666
 
   var count = 0
 
-  _.each(this.children, function(child, i) {
+  _.each(this.childrens, function(child, i) {
     if (child instanceof Element) {
       count += child.count
     } else {
-      children[i] = '' + child
+      childrens[i] = '' + child
     }
     count++
   })
@@ -53,7 +53,7 @@ Element.prototype.render = function() {
     _.setAttr(el, propName, propValue)
   }
 
-  _.each(this.children, function(child) {
+  _.each(this.childrens, function(child) {
     var childEl = (child instanceof Element)
       ? child.render()
       : document.createTextNode(child)
@@ -72,7 +72,7 @@ Element.deserialize = function(json) {
   function makeElement(obj) {
     obj.__proto__ = Element.prototype
     // obj.constructor = Element
-    _.each(obj.children, makeElement)
+    _.each(obj.childrens, makeElement)
   }
   makeElement(el)
   return el

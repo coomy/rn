@@ -1,18 +1,21 @@
 package coomy.rn;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 
-public class ElementDeserializer implements JsonDeserializer<Element> {
+public class ElementDeserializer implements JsonDeserializer<Element>, JsonSerializer<Element> {
     @Override
     public Element deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
@@ -26,26 +29,54 @@ public class ElementDeserializer implements JsonDeserializer<Element> {
 
         JsonElement childs = jsonObject.get("childrens");
         Element[] childrens = null;
-        if (childs!=null && !childs.isJsonNull()) {
+        if (childs!=null && !childs.isJsonNull() && childs.isJsonArray()) {
             JsonArray jsonChildrensArray = childs.getAsJsonArray();
             childrens = new Element[jsonChildrensArray.size()];
             for (int i = 0; i < childrens.length; i++) {
                 JsonElement jsonChildren = jsonChildrensArray.get(i);
-                if (!jsonChildren.isJsonNull() && jsonChildren.isJsonObject()) {
-                    childrens[i] = deserialize(jsonChildren, typeOfT, context);
-                }
-                else {
-                    childrens[i] = null; // 这个地方怎么处理。。如果特殊化，必须重写Serializer了。那两个都重写了，要考虑下TypeAdapter。
+                if (!jsonChildren.isJsonNull()) {
+                    if (jsonChildren.isJsonObject()||jsonChildren.isJsonArray()) {
+                        childrens[i] = deserialize(jsonChildren, typeOfT, context);
+                    } else if (jsonChildren.isJsonPrimitive()) {
+                        childrens[i] = new Element();
+                        childrens[i].setTagName(jsonChildren.getAsString());
+                        childrens[i].setText(true);
+                    }
                 }
             }
         }
 
         Element el = new Element();
-        el.tagName = tagName;
-        el.props = props;
-        el.childrens = childrens;
-        el.key = "xxx";
+        el.setTagName(tagName);
+        el.setProps(props);
+        el.setChildrens(childrens);
+        el.setKey("xxx");
 
         return el;
+    }
+
+    @Override
+    public JsonElement serialize(Element src, Type typeOfSrc, JsonSerializationContext context) {
+        if (src==null)
+            return null;
+
+        JsonObject obj = new JsonObject();
+        Gson gson = new Gson();
+
+        if (!src.isText()) {
+            obj.addProperty("tagName", src.getTagName());
+            obj.addProperty("props", gson.toJson(src.getProps()));
+
+            JsonArray arr = new JsonArray();
+            Element[] childrens = src.getChildrens();
+            for (int i=0; i<childrens.length; i++) {
+                arr.add(serialize(childrens[i], typeOfSrc, context));
+            }
+            obj.add("childrens", arr);
+        } else {
+            return new JsonPrimitive(src.getTagName());
+        }
+
+        return obj;
     }
 }

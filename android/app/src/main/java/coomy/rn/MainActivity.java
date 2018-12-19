@@ -1,7 +1,6 @@
 package coomy.rn;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +13,7 @@ import com.eclipsesource.v8.V8Object;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,18 +74,16 @@ public class MainActivity extends AppCompatActivity {
 
         runtime.executeScript(getFile(this, "util.js"));
         runtime.executeScript(getFile(this, "element.js"));
-
         String res = runtime.executeStringScript(getFile(this,"main.js"));
 
         Log.e("Coomy", "Result : " + res);
 
         Gson gson = new GsonBuilder().registerTypeAdapter(Element.class, new ElementDeserializer()).create();
-        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"],\"count\":1}],\"count\":15}";
-        Element el = gson.fromJson(Json, Element.class);
-
+//        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"],\"count\":1}],\"count\":15}";
+        Element el = gson.fromJson(res, Element.class);
         String jsonnn = gson.toJson(el);
 
-        Log.e("Coomy", "Result : " + el.tagName + jsonnn);
+        Log.e("Coomy", "Result : " + el.getTagName() + jsonnn);
 
         runtime.release();
     }
