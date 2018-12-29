@@ -10,6 +10,7 @@ import com.eclipsesource.v8.Releasable;
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
+import com.eclipsesource.v8.utils.V8Executor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -49,13 +50,19 @@ public class MainActivity extends AppCompatActivity {
         JavaVoidCallback callback = new JavaVoidCallback() {
             @Override
             public void invoke(V8Object v8Object, V8Array v8Array) {
-            if (v8Array.length() > 0) {
-                Object arg1 = v8Array.get(0);
-                Log.e("CoomyRn", "js callback args : " + arg1);
-                if (arg1 instanceof Releasable) {
-                    ((Releasable) arg1).release();
+                if (v8Array.length() > 0) {
+                    Object arg1 = v8Array.get(0);
+                    Log.e("CoomyRn", "js callback args : " + arg1);
+                    if (arg1 instanceof Releasable) {
+                        ((Releasable) arg1).release();
+                    }
                 }
-            }
+                if (v8Object instanceof Releasable) {
+                    ((Releasable) v8Object).release();
+                }
+                if (v8Array instanceof Releasable) {
+                    ((Releasable) v8Array).release();
+                }
             }
         };
 
@@ -64,16 +71,16 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("CoomyRn", "JS result is : " + result);
 
-//        String readJS = getFromAssets("test1.js");
-//        runtime.executeScript(readJS);
-////        runtime.executeScript(getFromAssets("test2.js"));
-//        String res = runtime.executeStringScript(getFromAssets("test2.js"));
+        Object retUtil = runtime.executeScript(getFile(this, "util.js") + "\r\n" + getFile(this, "element.js"));
+//        Object retElement = runtime.executeScript(getFile(this, "element.js"));
+        if (retUtil instanceof Releasable) {
+            ((Releasable) retUtil).release();
+        }
+//        if (retElement instanceof Releasable) {
+//            ((Releasable) retElement).release();
+//        }
+        Log.e("Coomy", String.valueOf(runtime.getObjectReferenceCount()));
 
-//        String res = runtime.executeStringScript("bbb()");
-//        Log.e("CoomyRn", "JS result is : " + res);
-
-        runtime.executeScript(getFile(this, "util.js"));
-        runtime.executeScript(getFile(this, "element.js"));
         String res = runtime.executeStringScript(getFile(this,"main.js"));
 
         Log.e("Coomy", "Result : " + res);
@@ -85,6 +92,10 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("Coomy", "Result : " + el.getTagName() + jsonnn);
 
-        runtime.release();
+
+        Element eee = J2V8Engine.getInstance().make("main.js");
+        Log.e("Coomy", "Result : " + eee.getTagName());
+        J2V8Engine.getInstance().release();
+
     }
 }
