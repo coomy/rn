@@ -1,8 +1,5 @@
 package coomy.rn;
 
-import android.app.Application;
-import android.content.Context;
-
 import com.eclipsesource.v8.Releasable;
 import com.eclipsesource.v8.V8;
 import com.google.gson.Gson;
@@ -54,7 +51,7 @@ public class J2V8Engine {
         String res = mRuntime.executeStringScript(loadJsFile(scriptFile));
 
         Gson gson = new GsonBuilder().registerTypeAdapter(
-                Element.class, new ElementDeserializer()).create();
+                Element.class, new ElementTokenizer()).create();
         return gson.fromJson(res, Element.class);
     }
 

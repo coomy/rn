@@ -15,7 +15,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-public class ElementDeserializer implements JsonDeserializer<Element>, JsonSerializer<Element> {
+public class ElementTokenizer implements JsonDeserializer<Element>, JsonSerializer<Element> {
     @Override
     public Element deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
@@ -65,7 +65,9 @@ public class ElementDeserializer implements JsonDeserializer<Element>, JsonSeria
 
         if (!src.isText()) {
             obj.addProperty("tagName", src.getTagName());
-            obj.addProperty("props", gson.toJson(src.getProps()));
+
+            Type mapType = new TypeToken<HashMap<String, String>>() {}.getType();
+            obj.add("props", context.serialize(src.getProps(), mapType));
 
             JsonArray arr = new JsonArray();
             Element[] childrens = src.getChildrens();

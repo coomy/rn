@@ -10,7 +10,6 @@ import com.eclipsesource.v8.Releasable;
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
-import com.eclipsesource.v8.utils.V8Executor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -85,17 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("Coomy", "Result : " + res);
 
-        Gson gson = new GsonBuilder().registerTypeAdapter(Element.class, new ElementDeserializer()).create();
-//        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"],\"count\":1},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"],\"count\":1}],\"count\":15}";
-        Element el = gson.fromJson(res, Element.class);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Element.class, new ElementTokenizer()).create();
+        String Json = "{\"tagName\":\"div\",\"props\":{\"id\":\"container\"},\"childrens\":[{\"tagName\":\"h1\",\"props\":{\"style\":\"color: red\"},\"childrens\":[\"simple virtal dom\"]},{\"tagName\":\"p\",\"props\":{},\"childrens\":[\"hello world\"]}]}";
+        Element el = gson.fromJson(Json, Element.class);
         String jsonnn = gson.toJson(el);
 
         Log.e("Coomy", "Result : " + el.getTagName() + jsonnn);
 
 
-        Element eee = J2V8Engine.getInstance().make("main.js");
+        J2V8Engine engine = J2V8Engine.getInstance();
+        Element eee = engine.make("main.js");
         Log.e("Coomy", "Result : " + eee.getTagName());
-        J2V8Engine.getInstance().release();
+        engine.release();
 
     }
 }
